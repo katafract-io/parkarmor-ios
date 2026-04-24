@@ -1398,8 +1398,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/katafract-io/KatafractStyle";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.2;
+				kind = exactVersion;
+				version = 0.1.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
