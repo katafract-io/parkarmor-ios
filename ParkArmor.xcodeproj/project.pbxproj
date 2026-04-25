@@ -1396,7 +1396,7 @@
 /* Begin XCRemoteSwiftPackageReference section */
 		KATA0001KATA0001KATA0001 /* XCRemoteSwiftPackageReference "KatafractStyle" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/katafract-io/KatafractStyle";
+			repositoryURL = "../KatafractStyle";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.1.2;
