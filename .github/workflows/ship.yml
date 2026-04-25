@@ -35,15 +35,6 @@ jobs:
             -H "X-Webhook-Secret: \${{ secrets.MATRIX_WEBHOOK_SECRET }}" \
             -d "\$PAYLOAD" || true
 
-      - name: Clone sibling KatafractStyle
-        run: |
-          PARENT="$(dirname "$GITHUB_WORKSPACE")"
-          if [ ! -d "$PARENT/KatafractStyle/.git" ]; then
-            git clone --depth 1 https://github.com/katafract-io/KatafractStyle "$PARENT/KatafractStyle"
-          else
-            git -C "$PARENT/KatafractStyle" fetch --depth 1 origin main && git -C "$PARENT/KatafractStyle" reset --hard origin/main
-          fi
-
       - name: Load runner env
         run: |
           if [ ! -f "$HOME/runner-env/parkarmor.env" ]; then
