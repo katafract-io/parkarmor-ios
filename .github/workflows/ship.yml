@@ -165,19 +165,12 @@ jobs:
           ls -la "$APP/PlugIns/" 2>/dev/null || echo "(no extensions)"
 
       - name: Export IPA
-        env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           set -o pipefail
           xcodebuild -exportArchive \
             -archivePath "$ARCHIVE_PATH" \
             -exportOptionsPlist "$EXPORT_OPTIONS" \
-            -exportPath "$EXPORT_PATH" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$ASC_KEY_PATH" \
-            -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID" 2>&1 | tee /tmp/export.log
+            -exportPath "$EXPORT_PATH" 2>&1 | tee /tmp/export.log
           # Fail loudly if export didn't produce an IPA or the log says EXPORT FAILED
           if grep -q "EXPORT FAILED" /tmp/export.log; then
             echo "::error::Export IPA failed — see log above"; exit 1
