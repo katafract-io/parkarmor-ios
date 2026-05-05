@@ -6,6 +6,7 @@ final class ScreenshotTests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app.launchArguments = ["-ScreenshotMode", "seedData"]
+        setupSnapshot(app)
         app.launch()
     }
 
