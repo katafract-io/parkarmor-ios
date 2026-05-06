@@ -116,6 +116,11 @@ jobs:
             echo "asc_max=$ASC_MAX run_based=$RUN_BUILD using=$BUILD_NUM"
           fi
 
+          TRAIN=$(grep -m1 "MARKETING_VERSION = " ParkArmor.xcodeproj/project.pbxproj \
+                  | sed -E 's/.*MARKETING_VERSION = ([^;]+);.*/\1/')
+          echo "marketing train: $TRAIN"
+          python3 ci_scripts/lib/check-marketing-version.py --app-id "$APP_ID" --train "$TRAIN"
+
           xcrun agvtool new-version -all $BUILD_NUM
 
           echo "BUILD_NUM=$BUILD_NUM" >> "$GITHUB_ENV"
