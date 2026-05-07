@@ -63,7 +63,7 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if appViewModel.hasSeenOnboarding {
+            if appViewModel.hasSeenOnboarding || ScreenshotMode.skipOnboarding {
                 AppTabView()
             } else {
                 OnboardingView()

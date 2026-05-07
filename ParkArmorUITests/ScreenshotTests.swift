@@ -6,40 +6,71 @@ class ScreenshotTests: XCTestCase {
         continueAfterFailure = false
     }
 
-    /// Home: parking session active, timer running
-    func testHomeActive() throws {
+    /// Frame 01: Map tab — empty state, tap-to-park hero CTA
+    func testMapEmpty() throws {
         let app = launchApp(args: ["--screenshots"])
-        snapshot("01-home-active")
+        sleep(3)
+        snapshot("01-map-empty")
     }
 
-    /// Map view: current location + parked spot pin
-    func testMapView() throws {
+    /// Frame 02: History tab — empty state with prompt
+    func testHistoryEmpty() throws {
         let app = launchApp(args: ["--screenshots"])
-        snapshot("02-map-view")
+        sleep(2)
+        app.tabBars.buttons["History"].tap()
+        sleep(2)
+        snapshot("02-history-empty")
     }
 
-    /// Timer settings: duration + notification prefs
-    func testTimerSettings() throws {
-        let app = launchApp(args: ["-mscreenshots"])
-        snapshot("03-timer-settings")
-    }
-
-    /// Completed session: duration + distance
-    func testSessionComplete() throws {
+    /// Frame 03: Settings tab — preferences + Pro upgrade row
+    func testSettings() throws {
         let app = launchApp(args: ["--screenshots"])
-        snapshot("04-session-complete")
+        sleep(2)
+        app.tabBars.buttons["Settings"].tap()
+        sleep(2)
+        snapshot("03-settings")
     }
 
-    /// History: list of past sessions
-    func testHistory() throws {
-        let app = launchApp(args: ["--screenshots"])
-        snapshot("05-history")
-    }
-
-    /// Pro paywall: upgrade features sheet
+    /// Frame 04: Pro upgrade paywall
     func testUpgradePaywall() throws {
         let app = launchApp(args: ["--screenshots"])
-        snapshot("06-upgrade-paywall")
+        sleep(2)
+        // Navigate to Settings and tap the first upgrade / Pro button
+        app.tabBars.buttons["Settings"].tap()
+        sleep(1)
+        let upgradeButton = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'Pro' OR label CONTAINS[c] 'Upgrade' OR label CONTAINS[c] 'Unlock'")).firstMatch
+        if upgradeButton.waitForExistence(timeout: 4) {
+            upgradeButton.tap()
+            sleep(2)
+        }
+        snapshot("04-upgrade-paywall")
+    }
+
+    /// Frame 05: Map tab — save parking confirmation prompt
+    func testSaveParkingPrompt() throws {
+        let app = launchApp(args: ["--screenshots"])
+        sleep(2)
+        // Tap the primary CTA on the map to initiate parking save
+        let saveButton = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'Park' OR label CONTAINS[c] 'Save' OR label CONTAINS[c] 'Here'")).firstMatch
+        if saveButton.waitForExistence(timeout: 5) {
+            saveButton.tap()
+            sleep(2)
+        }
+        snapshot("05-save-parking")
+    }
+
+    /// Frame 06: Widget / CarPlay description in Settings
+    func testWidgetInfo() throws {
+        let app = launchApp(args: ["--screenshots"])
+        sleep(2)
+        app.tabBars.buttons["Settings"].tap()
+        sleep(1)
+        let widgetCell = app.cells.matching(NSPredicate(format: "label CONTAINS[c] 'Widget' OR label CONTAINS[c] 'CarPlay'")).firstMatch
+        if widgetCell.waitForExistence(timeout: 4) {
+            widgetCell.tap()
+            sleep(2)
+        }
+        snapshot("06-widget-carplay")
     }
 
     @discardableResult
