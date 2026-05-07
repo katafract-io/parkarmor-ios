@@ -14,6 +14,12 @@ struct ParkArmorApp: App {
             ParkingTimer.self,
         ])
 
+        // Screenshot mode: in-memory store so seed data is always fresh.
+        if ScreenshotMode.isEnabled {
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            return try! ModelContainer(for: schema, configurations: [config])
+        }
+
         // Prefer shared App Group container; fall back to default location.
         let storeURL: URL
         if let groupURL = FileManager.default.containerURL(

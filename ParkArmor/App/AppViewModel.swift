@@ -45,6 +45,7 @@ import Observation
 
     func configure(context: ModelContext) {
         repository = ParkingRepository(context: context)
+        MockDataSeeder.seedDataIfNeeded(into: context)
         watchSession.statusProvider = { [weak self] in
             self?.currentWatchStatusPayload() ?? ["status": "error", "message": "Phone still starting"]
         }
