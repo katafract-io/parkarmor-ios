@@ -125,6 +125,13 @@
 			);
 			target = BCA03D922F74BC5E00772D5A /* ParkArmorWatchComplicationExtension */;
 		};
+		CCCC00EECCCC00EECCCC00EE /* Exceptions for "ParkArmorUITests" folder in "ParkArmorUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CCCC0005CCCC0005CCCC0005 /* ParkArmorUITests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -183,6 +190,9 @@
 		};
 		CCCC0003CCCC0003CCCC0003 /* ParkArmorUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CCCC00EECCCC00EECCCC00EE /* Exceptions for "ParkArmorUITests" folder in "ParkArmorUITests" target */,
+			);
 			path = ParkArmorUITests;
 			sourceTree = "<group>";
 		};

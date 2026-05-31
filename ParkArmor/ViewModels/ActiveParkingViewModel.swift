@@ -32,6 +32,16 @@ import Observation
         isActive = true
         elapsedSeconds = Date().timeIntervalSince(parking.savedAt)
 
+        // Screenshot mode: the simulator has no live GPS fix, so the walk-back
+        // compass would render blank. Seed a deterministic distance + bearing so
+        // the hero frame shows "easy walk back" (NE • 0.2 mi).
+        if ScreenshotMode.isEnabled {
+            distanceText = preferences.distanceUnit.formatted(322) // ~0.2 mi
+            compassCardinal = "NE"
+            bearingDegrees = 45
+            headingDegrees = 0
+        }
+
         timerTask = Task {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1))
