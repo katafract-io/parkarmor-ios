@@ -17,6 +17,13 @@ import StoreKit
     private var updateTask: Task<Void, Never>?
 
     init() {
+        // Screenshot mode: present a fully-unlocked Pro experience so App Store
+        // hero frames show the complete, converting feature set (named spot,
+        // map history pins, share). No real entitlement is granted at runtime.
+        if ScreenshotMode.isEnabled {
+            isPro = true
+            return
+        }
         updateTask = Task {
             await listenForTransactions()
         }
