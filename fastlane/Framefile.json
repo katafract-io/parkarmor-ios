@@ -1,0 +1,41 @@
+{
+  "default": {
+    "title": {
+      "text": "ParkArmor",
+      "fontName": "Helvetica-Bold",
+      "fontSize": 36,
+      "fontColor": "#00F0FF",
+      "align": "center"
+    },
+    "background": "#0B0C12",
+    "padding": 50,
+    "interline": 10,
+    "title_below_image": false
+  },
+  "data": [
+    {
+      "filename": "01-active-detail.png",
+      "title": "Never lose your car again"
+    },
+    {
+      "filename": "02-map-active.png",
+      "title": "Snap the sign. Pin the spot. Walk back easy."
+    },
+    {
+      "filename": "03-meter-timer.png",
+      "title": "Beat the meter — alerts before you get a ticket"
+    },
+    {
+      "filename": "04-history.png",
+      "title": "Every spot you've ever parked, right here"
+    },
+    {
+      "filename": "05-settings.png",
+      "title": "Set it up once. Park with confidence."
+    },
+    {
+      "filename": "06-upgrade-paywall.png",
+      "title": "Unlock unlimited spots + CarPlay"
+    }
+  ]
+}
