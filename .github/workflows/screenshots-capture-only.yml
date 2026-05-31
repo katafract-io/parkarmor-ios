@@ -1,0 +1,145 @@
+name: Screenshots capture-only (no ASC, sign-off path)
+
+# Doctrine: feedback_screenshot_visual_review_required.md
+# Captures the full device-class set, frames with device bezels, and uploads the PNGs
+# as a CI artifact for sign-off. Does NOT touch ASC.
+# Run submit_version_screenshots (screenshots.yml) AFTER sign-off to deliver.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: screenshots-capture-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    name: Capture all device classes (no deliver)
+    runs-on: [ self-hosted, macOS, ios-build, ARM64 ]
+    timeout-minutes: 60
+
+    env:
+      APP_NAME: parkarmor
+      BUNDLE_ID: com.katafract.ParkArmor
+      SCHEME: ParkArmor
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Load runner env
+        run: |
+          ENV_FILE="$HOME/runner-env/${APP_NAME}.env"
+          if [ -f "$ENV_FILE" ]; then
+            grep -v '^#' "$ENV_FILE" | grep '=' >> "$GITHUB_ENV"
+          fi
+
+      - name: Unlock keychain
+        run: |
+          if [ -n "$KEYCHAIN" ]; then
+            security unlock-keychain -p "" "$KEYCHAIN" || true
+          fi
+
+      - name: Install Ruby deps (Ruby 3.3.11 via rbenv)
+        run: |
+          RUBY_BIN=""
+          if [ -x "${HOME}/.rbenv/versions/3.3.11/bin/ruby" ]; then
+            RUBY_BIN="${HOME}/.rbenv/versions/3.3.11/bin/ruby"
+          elif command -v rbenv >/dev/null 2>&1; then
+            eval "$(rbenv init - bash)"
+            RUBY_BIN="$(rbenv which ruby 2>/dev/null)"
+          fi
+          if [ -z "$RUBY_BIN" ] || [ ! -x "$RUBY_BIN" ]; then
+            RUBY_BIN="$(command -v ruby 2>/dev/null)"
+          fi
+          if [ -z "$RUBY_BIN" ] || [ ! -x "$RUBY_BIN" ]; then
+            echo "::error::Could not find Ruby 3.3.x"; exit 1
+          fi
+          export PATH="$(dirname "$RUBY_BIN"):$PATH"
+          $RUBY_BIN --version
+          $RUBY_BIN -S bundle config set --local path 'vendor/bundle'
+          $RUBY_BIN -S bundle install --jobs 4 --retry 3 2>&1 | tail -10
+
+      - name: Resolve SPM
+        run: |
+          xcodebuild -project ${SCHEME}.xcodeproj -scheme ${SCHEME} \
+            -resolvePackageDependencies 2>&1 | tail -5 || true
+
+      - name: Run capture-only lane (NO deliver)
+        id: capture
+        env:
+          FASTLANE_HIDE_CHANGELOG: 1
+          FASTLANE_SKIP_UPDATE_CHECK: 1
+          FASTLANE_DISABLE_COLORS: 1
+        run: |
+          set -o pipefail
+          RUBY_BIN=""
+          if [ -x "${HOME}/.rbenv/versions/3.3.11/bin/ruby" ]; then
+            RUBY_BIN="${HOME}/.rbenv/versions/3.3.11/bin/ruby"
+          elif command -v rbenv >/dev/null 2>&1; then
+            eval "$(rbenv init - bash)"
+            RUBY_BIN="$(rbenv which ruby 2>/dev/null)"
+          fi
+          if [ -z "$RUBY_BIN" ] || [ ! -x "$RUBY_BIN" ]; then
+            RUBY_BIN="$(command -v ruby 2>/dev/null)"
+          fi
+          export PATH="$(dirname "$RUBY_BIN"):$PATH"
+          rm -rf fastlane/screenshots
+          $RUBY_BIN -S bundle exec fastlane screenshots 2>&1 | tee /tmp/fastlane-capture.log | tail -120
+          SHOTS=$(find fastlane/screenshots -name '*.png' 2>/dev/null | wc -l | tr -d ' ')
+          echo "shot_count=${SHOTS}" >> "$GITHUB_OUTPUT"
+          echo "capture produced ${SHOTS} PNG(s)"
+
+      - name: Frame screenshots (frameit)
+        run: |
+          RUBY_BIN=""
+          if [ -x "${HOME}/.rbenv/versions/3.3.11/bin/ruby" ]; then
+            RUBY_BIN="${HOME}/.rbenv/versions/3.3.11/bin/ruby"
+          elif command -v rbenv >/dev/null 2>&1; then
+            eval "$(rbenv init - bash)"
+            RUBY_BIN="$(rbenv which ruby 2>/dev/null)"
+          fi
+          if [ -z "$RUBY_BIN" ] || [ ! -x "$RUBY_BIN" ]; then
+            RUBY_BIN="$(command -v ruby 2>/dev/null)"
+          fi
+          export PATH="$(dirname "$RUBY_BIN"):$PATH"
+          $RUBY_BIN -S bundle exec fastlane frameit silver --path fastlane/screenshots \
+            || { echo "warn: frameit failed (non-fatal for capture-only)"; exit 0; }
+
+      - name: Verify PNG distinctness
+        run: |
+          cd fastlane/screenshots
+          find . -name "*.png" -type f | sort | while read f; do
+            MD5=$(md5sum "$f" | awk '{print $1}')
+            echo "$MD5  $f"
+          done > /tmp/png-hashes.txt
+          cat /tmp/png-hashes.txt
+
+      - name: Collect artifacts
+        if: always()
+        run: |
+          rm -rf /tmp/screenshot-capture-art
+          mkdir -p /tmp/screenshot-capture-art
+          cp -r fastlane/screenshots /tmp/screenshot-capture-art/ 2>/dev/null || true
+          tail -200 /tmp/fastlane-capture.log > /tmp/screenshot-capture-art/fastlane.tail.log 2>/dev/null || true
+          cp /tmp/png-hashes.txt /tmp/screenshot-capture-art/ 2>/dev/null || true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: parkarmor-screenshots-capture-${{ github.run_number }}
+          path: /tmp/screenshot-capture-art/
+          retention-days: 14
+
+      - name: Hard fail if <6 PNGs
+        if: always()
+        run: |
+          SHOTS="${{ steps.capture.outputs.shot_count }}"
+          if [ "${SHOTS:-0}" -lt 6 ]; then
+            echo "::error::Capture produced ${SHOTS:-0} PNGs (<6) — inspect artifact."
+            exit 1
+          fi
+          echo "Capture OK — ${SHOTS} PNG(s) ready for sign-off."
