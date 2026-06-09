@@ -69,7 +69,9 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if appViewModel.hasSeenOnboarding || ScreenshotMode.skipOnboarding {
+            if let route = ScreenshotMode.route {
+                ScreenshotRouteView(route: route)
+            } else if appViewModel.hasSeenOnboarding || ScreenshotMode.skipOnboarding {
                 AppTabView()
             } else {
                 OnboardingView()
@@ -124,5 +126,35 @@ struct AppTabView: View {
         .toolbarBackground(DesignTokens.parkTabBarBackground, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
         .toolbarColorScheme(.dark, for: .tabBar)
+    }
+}
+
+
+// MARK: - Screenshot deep-link router (real screens + seeded data, for ASO captures)
+
+struct ScreenshotRouteView: View {
+    let route: ScreenshotRoute
+    @Environment(AppViewModel.self) private var appViewModel
+    @Query(filter: #Predicate<ParkingLocation> { $0.isActive }) private var activeLocations: [ParkingLocation]
+
+    var body: some View {
+        switch route {
+        case .map:
+            AppTabView().onAppear { appViewModel.selectedTab = .map }
+        case .history:
+            AppTabView().onAppear { appViewModel.selectedTab = .history }
+        case .parked:
+            ParkedSuccessView(
+                address: "Embarcadero Center Garage, San Francisco, CA",
+                savedAt: Date(),
+                onDone: {}
+            )
+        case .active:
+            if let active = activeLocations.first {
+                ActiveParkingView(parking: active, onDismiss: {})
+            } else {
+                AppTabView()
+            }
+        }
     }
 }
