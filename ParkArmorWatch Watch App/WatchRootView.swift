@@ -186,10 +186,6 @@ private struct WatchActiveParkingView: View {
             .disabled(viewModel.isEndingParking || !viewModel.isPhoneReachable)
             .buttonStyle(.borderedProminent)
             .tint(Color(red: 0.82, green: 0.14, blue: 0.18))
-            .overlay {
-                RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(.white.opacity(0.3), lineWidth: 1)
-            }
 
             Spacer(minLength: 0)
         }
