@@ -40,7 +40,6 @@ import WidgetKit
     var isPhoneReachable = false
     var statusMessage: String?
     var syncState: SyncState = .syncing
-    let isScreenshotMode = CommandLine.arguments.contains("--screenshots")
     /// Timestamp of the last application context written by the phone.
     var contextUpdatedAt: Date?
 
@@ -80,20 +79,6 @@ import WidgetKit
 
     override init() {
         super.init()
-        if isScreenshotMode {
-            // Screenshot mode: seed a believable active parking; skip WCSession + live location.
-            activeParkingSnapshot = WatchParkingSnapshot(
-                latitude: 37.7956, longitude: -122.3933,
-                address: "Embarcadero Center Garage, San Francisco, CA",
-                savedAt: Date(timeIntervalSinceNow: -47 * 60),
-                timerExpiresAt: Date(timeIntervalSinceNow: 13 * 60)
-            )
-            userLocation = CLLocation(latitude: 37.7920, longitude: -122.3970)
-            isPhoneReachable = true
-            statusMessage = nil
-            syncState = .live
-            return
-        }
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
@@ -267,7 +252,6 @@ import WidgetKit
     }
 
     func syncNow() {
-        if isScreenshotMode { return }
         guard shouldStartSyncCycle else { return }
         syncAttemptCount = 0
         if WCSession.default.isReachable {
