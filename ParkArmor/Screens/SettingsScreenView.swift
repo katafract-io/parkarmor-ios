@@ -108,7 +108,7 @@ struct SettingsScreenView: View {
                         Text("Upgrade to Pro")
                             .foregroundStyle(DesignTokens.parkTextPrimary)
                         Spacer()
-                        Text(appViewModel.storeKitManager.proProduct?.displayPrice ?? "$3.99")
+                        Text(appViewModel.storeKitManager.proProduct?.displayPrice ?? "$0.99")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(DesignTokens.parkAccentText)
                     }
