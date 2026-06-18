@@ -1,0 +1,25 @@
+/* ParkArmor screenshot banners and captions */
+
+/* Frame 01 (HERO): Active saved-spot detail — location + sign photo + meter countdown + walk-back distance */
+"01-active-detail.png" = "Never lose your car again";
+"01-active-detail-caption" = "Your exact spot, the parking sign, and a live countdown — all in one glance.";
+
+/* Frame 02: Map with active spot pinned + live countdown banner */
+"02-map-active.png" = "Snap the sign. Pin the spot. Walk back easy.";
+"02-map-active-caption" = "See your car on the map the moment you lock it. No more wandering the parking structure.";
+
+/* Frame 03: Meter timer close-up / beat-the-meter countdown */
+"03-meter-timer.png" = "Beat the meter — alerts before you get a ticket";
+"03-meter-timer-caption" = "ParkArmor nudges you before the meter runs out so you never come back to a ticket.";
+
+/* Frame 04: History tab — past saved spots with addresses + nicknames */
+"04-history.png" = "Every spot you've ever parked, right here";
+"04-history-caption" = "Browse your parking history by address or nickname. Revisit the garage you always forget.";
+
+/* Frame 05: Settings — preferences + Pro row */
+"05-settings.png" = "Set it up once. Park with confidence.";
+"05-settings-caption" = "Tune alerts, default durations, and CarPlay behavior to match how you actually park.";
+
+/* Frame 06: Pro upgrade paywall */
+"06-upgrade-paywall.png" = "Unlock unlimited spots + CarPlay";
+"06-upgrade-paywall-caption" = "Unlimited saved spots, meter alerts, and full CarPlay integration — one-time unlock.";
